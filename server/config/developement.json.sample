@@ -1,0 +1,13 @@
+
+{
+  "host": "localhost",
+  "devURL": "http://localhost:5000",
+  "env": "development",
+  "dbURL": "<db_url>",
+  "sessionSecret": "<session_secret>",
+  "passwordConfig": {
+    "hashBytes": 64,
+    "saltBytes": 16,
+    "iterations": 872791
+  }
+}
