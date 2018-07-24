@@ -1,69 +1,69 @@
 import React, {Component} from 'react';
 import '../components-styles/console.css';
+import SocketIoClient from 'socket.io-client';
 import { getToken } from '../utils/localStorageUtils';
-import Loading from './Loading';
+import config from '../config/config';
+import Button from "./Button";
 
-const API_PATH = 'http://localhost:5000/connection/';
+const SOCKET_PATH = config.serverPath;
 
 class Console extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            connected: undefined
+            userToken: getToken(),
+            socketMessages: [],
+        };
+        if (this.state.userToken) {
+            this.socketClient = SocketIoClient(SOCKET_PATH, {
+                query: {
+                    token: this.state.userToken
+                }
+            });
         }
+
+        this.handleButtonClick = this.handleButtonClick.bind(this);
     }
 
     componentDidMount() {
-        const token = getToken();
-        const headers = new Headers();
-        headers.append('Accept', 'application/json');
-        headers.append('Content-Type', 'application/json');
-        headers.append('Authorization', `Bearer ${token}`);
-
-        const connectionError = (error) => {
-            console.log(error);
+        const { socketMessages } = this.state;
+        this.socketClient.on('message', message => {
+            console.log(message);
+            socketMessages.push(message.value);
             this.setState({
-                connected: false
+                socketMessages: socketMessages
             })
-        };
-
-        fetch(API_PATH + 'init', {
-            method: 'POST',
-            headers: headers,
-            body: {},
         })
-            .then(result => {
-                console.log(result);
-                if (result.status === 200) {
-                    return result.json();
-                } else {
-                    connectionError(result);
-                }
-            })
-            .then(result => {
-                this.setState({
-                    connected: true
-                })
-            })
-            .catch(err => connectionError(err));
     }
 
+    handleButtonClick = (event) => {
+        event.preventDefault();
+        console.log("Button clicked");
+    };
+
     render() {
-        const { connected } = this.state;
-        let content = <h3>Console content</h3>;
-        if (connected === undefined) {
-            content = <Loading/>
-        } else if (connected) {
-            content = <h3>Console content</h3>;
-        } else {
-            content = <h3>Error on connection</h3>
-        }
+        const { username } = this.props;
 
         return (
             <div tabIndex={0}>
                 <div className={'gui-wrapper'}>
-                    <h1>Console</h1>
-                    {content}
+                    <h1 className="text-center text-sm-left">Console - <span className="username">{username}</span></h1>
+                    <hr/>
+                    <div className="row mt-4">
+                        <div className="col-12 col-md-8 order-md-12 mb-4 mb-md-0">
+                            <Button handleClick={this.handleButtonClick}/>
+                        </div>
+                        <div className="col-12 col-md-4 order-md-1">
+                            <h4 className="text-center text-sm-left">Server messages</h4>
+                            <ul>
+                                { this.state.socketMessages.map((message, index) =>
+                                    <li key={index}>
+                                        {message}
+                                    </li>
+                                ) }
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         )

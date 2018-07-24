@@ -2,6 +2,6 @@ const express = require('express');
 const connectionController = require('../controller/connectionController');
 const router = express.Router();
 
-router.post('/init', connectionController.init_server_socket);
+router.post('/emit', connectionController.emit_message);
 
 module.exports = router;

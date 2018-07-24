@@ -1,6 +1,10 @@
 const SocketServer = require('../utils/SocketServer');
-let server = new SocketServer();
 
-exports.init_server_socket = (req, res, next) => {
-    console.log("init client server")
+exports.emit_message = (req, res, next) => {
+    const message = req.body.value;
+    SocketServer.sendAll(message);
+    res.header('Content-Type', 'application/json');
+    res.status(200);
+    res.json({send: true});
 };
+

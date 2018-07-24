@@ -1,3 +1,99 @@
+const jwt = require('jsonwebtoken');
+const jsonWebToken = require('../crypto/jsonWebToken');
+
+const connectedClients = {};
+let io = undefined;
+
+const init = (server) => {
+    if (!io) {
+        io = require('socket.io')(server);
+
+        // middleware
+        io.use((socket, next) => {
+            const token = socket.handshake.query.token;
+
+            jwt.verify(token, process.env.SECRET, function (err, user) {
+                if (err) {
+                    return next(new Error('Authentication error'));
+                } else {
+                    return next();
+                }
+            });
+        });
+
+        io.on('connection', function(socket){
+            const token = socket.handshake.query.token;
+            const user = jsonWebToken.getUserData(token);
+            connectedClients[user._id] = socket;
+            let newUserConnectedMessage = "User connected: " + user.username;
+            console.log(newUserConnectedMessage);
+            sendAll(newUserConnectedMessage);
+        });
+    }
+};
+
+const sendAll = (value) => {
+    Object.keys(connectedClients).forEach(key => {
+        let socket = connectedClients[key];
+        socket.emit('message', {
+            value: value
+        });
+    })
+};
+
+module.exports = {
+    init: init,
+    sendAll: sendAll
+};
+
+/*function SocketServer(server) {
+    if (!io) {
+        start(server);
+    }
+
+    function start(server) {
+        io = require('socket.io')(server);
+
+        // middleware
+        io.use((socket, next) => {
+            const token = socket.handshake.query.token;
+
+            jwt.verify(token, process.env.SECRET, function (err, user) {
+                if (err) {
+                    return next(new Error('Authentication error'));
+                } else {
+                    return next();
+                }
+            });
+        });
+
+        io.on('connection', function(socket){
+            const token = socket.handshake.query.token;
+            const user = jsonWebToken.getUserData(token);
+            connectedClients[user._id] = socket;
+            let newUserConnectedMessage = "User connected: " + user.username;
+            console.log(newUserConnectedMessage);
+            send({
+                value: newUserConnectedMessage
+            });
+        });
+    }
+}
+
+function send(object) {
+    Object.keys(connectedClients).forEach(key => {
+        let socket = connectedClients[key];
+        socket.emit('message', object);
+    })
+}*/
+
+
+
+
+
+
+
+/*
 const net = require('net');
 const config = require('../config/config');
 
@@ -6,7 +102,7 @@ const connectedClients = {};
 function SocketServer() {
     start();
 
-    this.send = function(object) {
+    this.send = (object) => {
         for(key in connectedClients)
             connectedClients[key].write(JSON.stringify(object))
     };
@@ -14,6 +110,8 @@ function SocketServer() {
     function start() {
         const server = net.createServer(socket => {
             console.log("Server socket created");
+            console.log(socket);
+            console.log("Address = \t" + socket.remoteAddress);
             const clientId = `${socket.remoteAddress}`;
             connectedClients[clientId] = socket;
 
@@ -21,6 +119,7 @@ function SocketServer() {
 
             socket.on('data', message => {
                 console.log("Message recived: " + message);
+                console.log(String(message));
             });
 
             socket.on('end', () => {
@@ -46,4 +145,4 @@ function SocketServer() {
     }
 }
 
-module.exports = SocketServer;
+module.exports = new SocketServer();*/

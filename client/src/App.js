@@ -6,8 +6,9 @@ import Register from './components/Register';
 import Loading from './components/Loading';
 import {validateRequiredInput} from "./utils/validation";
 import { setToken, getToken, removeToken } from './utils/localStorageUtils';
+import config from './config/config';
 
-const APPLICATION_API_HOST = 'http://localhost:5000';
+const APPLICATION_API_HOST = config.serverPath;
 const API_HEADERS = new Headers();
 API_HEADERS.append('Accept', 'application/json');
 API_HEADERS.append('Content-Type', 'application/json');
@@ -146,7 +147,7 @@ class App extends Component {
                                 username: result.username
                             },
                             isLoading: false,
-                            title: 'FuffaTeam - Console'
+                            title: 'Fanta Auction - Console'
                         });
                     }
                 }
@@ -159,7 +160,7 @@ class App extends Component {
     handleLogoutClick = (event) => {
         event.preventDefault();
         this.setState({
-            title: 'FuffaTeam',
+            title: 'Fanta Auction',
             isLoading: false,
             userLogged: false,
             userId: '',
@@ -191,7 +192,7 @@ class App extends Component {
     handleLinkClick = (event, page) => {
         event.preventDefault();
         const { userLogged, username } = this.state;
-        let title = 'FuffaTeam';
+        let title = 'Fanta Auction';
         if (page !== 'home') {
             title += ' - ' + page[0].toUpperCase() + page.substr(1);
         } else if (page === 'home' && userLogged) {
@@ -327,7 +328,7 @@ class App extends Component {
                             username: result.user.username
                         },
                         isLoading: false,
-                        title: 'FuffaTeam - Console',
+                        title: 'Fanta Auction - Console',
                         currentPage: 'home'
                     });
                 }

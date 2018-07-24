@@ -100,3 +100,5 @@ gen
 # server config files
 server/config/development.json
 server/config/production.json
+client/src/config/development.json
+client/src/config/production.json
