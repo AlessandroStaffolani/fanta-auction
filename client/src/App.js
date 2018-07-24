@@ -390,7 +390,7 @@ class App extends Component {
 
                     </div>
                 </nav>
-                <div className="app-wrapper">
+                <div className="app-wrapper pt-4">
                     <div className={'container'}>
                         {this.state.isLoading ? <Loading/> : content}
                     </div>

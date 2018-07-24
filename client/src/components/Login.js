@@ -43,7 +43,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             <div className="text-right">
-                                <button type="submit" className="btn btn-primary">Login</button>
+                                <button type="submit" className="btn btn-success">Login</button>
                             </div>
                         </form>
                         <hr />

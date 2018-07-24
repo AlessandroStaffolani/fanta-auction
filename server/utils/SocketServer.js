@@ -27,15 +27,15 @@ const init = (server) => {
             connectedClients[user._id] = socket;
             let newUserConnectedMessage = "User connected: " + user.username;
             console.log(newUserConnectedMessage);
-            sendAll(newUserConnectedMessage);
+            //sendAll('message', newUserConnectedMessage);
         });
     }
 };
 
-const sendAll = (value) => {
+const sendAll = (type, value) => {
     Object.keys(connectedClients).forEach(key => {
         let socket = connectedClients[key];
-        socket.emit('message', {
+        socket.emit(type, {
             value: value
         });
     })

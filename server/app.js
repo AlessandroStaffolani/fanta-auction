@@ -75,13 +75,13 @@ const index = require('./api/index');
 const auth = require('./api/auth');
 const publicRoute = require('./api/public');
 const authController = require('./controller/authController');
-const connection = require('./api/connection');
+const admin = require('./api/admin');
 
 app.use('/', index);
 app.use('/auth/', auth);
 app.use('/public/', publicRoute);
 app.use(authController.is_authenticated);
-app.use('/connection', connection);
+app.use('/admin', admin);
 
 //==============================================================================
 

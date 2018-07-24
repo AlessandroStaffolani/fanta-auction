@@ -4,11 +4,11 @@ import '../components-styles/button.css'
 class Button extends React.Component {
 
     render() {
-        const { handleClick } = this.props;
+        const { handleClick, disabled } = this.props;
 
         return (
             <div tabIndex={0} className="button-wrapper">
-                <button className="button-shadow" onClick={handleClick}>
+                <button disabled={disabled} className="button-shadow" onClick={handleClick}>
                     <span className="button-content">
 
                     </span>
