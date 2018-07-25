@@ -5,6 +5,7 @@ const jsonWebToken = require('../crypto/jsonWebToken');
 const jwt = require('jsonwebtoken');
 
 const User = require('../model/user');
+const ADMIN_ROLE = 'admin';
 
 exports.login = [
 
@@ -98,4 +99,17 @@ exports.is_authenticated = (req, res, next) => {
             next();
         }
     })
+};
+
+exports.is_admin = (req, res, next) => {
+    const user = req.user;
+    if (user) {
+        if (user.role === ADMIN_ROLE) {
+            return next();
+        }
+    }
+    return res.status(401).json({
+        auth: false,
+        command: 'You are not allowed to access to this area'
+    });
 };

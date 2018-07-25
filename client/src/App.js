@@ -356,7 +356,7 @@ class App extends Component {
                 handleLinkClick={this.handleLinkClick}
             />;
             if (userLogged) {
-                content = <Console username={this.state.userLogged.username}/>
+                content = <Console handleLogout={this.handleLogoutClick} username={this.state.userLogged.username}/>
             }
         } else if (currentPage === 'register' && !userLogged) {
             content = <Register
@@ -371,24 +371,11 @@ class App extends Component {
 
         return (
             <div className="App">
-                <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon" />
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbar">
-                        <a className="navbar-brand" href="/" onClick={event => this.handleLinkClick(event, 'home')}>
-                            <img src={logo} width="30" height="30" className="d-inline-block align-top app-logo" alt=""/>
-                            {this.state.title}
-                        </a>
-                        {this.state.userLogged ?
-                            <ul className="navbar-nav mr-auto mt-2 mt-md-0">
-                                <li className="nav-item">
-                                    <a className="nav-link" href="/logout" onClick={this.handleLogoutClick}>Logout <span className="sr-only">(current)</span></a>
-                                </li>
-                            </ul>
-                            : ''}
-
-                    </div>
+                <nav className="navbar navbar-dark bg-dark">
+                    <a className="navbar-brand" href="/" onClick={event => this.handleLinkClick(event, 'home')}>
+                        <i className="fas fa-futbol d-inline-block align-top app-logo mr-3"/>
+                        {this.state.title}
+                    </a>
                 </nav>
                 <div className="app-wrapper pt-4">
                     <div className={'container'}>
@@ -401,3 +388,13 @@ class App extends Component {
 }
 
 export default App;
+
+/*
+{this.state.userLogged ?
+                        <ul className="navbar-nav mr-auto mt-2 mt-md-0">
+                            <li className="nav-item">
+                                <a className="nav-link" href="/logout" onClick={this.handleLogoutClick}>Logout <span className="sr-only">(current)</span></a>
+                            </li>
+                        </ul>
+                        : ''}
+ */

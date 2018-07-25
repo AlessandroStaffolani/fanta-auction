@@ -15,12 +15,14 @@ exports.timer_reset = (req, res, next) => {
     clearInterval(repeat);
     SocketServer.sendAll('timer', counter);
     SocketServer.sendAll('reset', true);
+    SocketServer.sendAll('message', '');
+    SocketServer.sendAll('reserved', false);
     res.header('Content-Type', 'application/json');
     res.status(200);
     res.json({send: true});
 };
 
-exports.timer_update = (req, res, next) => {
+exports.timer_start = (req, res, next) => {
     repeat = setInterval(() => {
         if (counter === 0) {
             SocketServer.sendAll('timer', 0);
@@ -42,4 +44,21 @@ exports.current_player = (req, res, next) => {
     res.header('Content-Type', 'application/json');
     res.status(200);
     res.json({send: true});
-}
+};
+
+exports.reserve_player = (req, res, next) => {
+    const user = req.user;
+    if (user) {
+        clearInterval(repeat);
+        SocketServer.sendAll('reserved', user.username);
+        SocketServer.sendAll('reset', true);
+        res.header('Content-Type', 'application/json');
+        res.status(200);
+        res.json({send: true});
+    } else {
+        return res.status(401).json({
+            auth: false,
+            command: 'You are not allowed to access to this area'
+        });
+    }
+};

@@ -1,4 +1,4 @@
 
-.username {
+.username, .player {
     text-transform: capitalize;
 }

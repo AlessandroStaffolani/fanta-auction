@@ -1,13 +1,13 @@
 const express = require('express');
-const adminController = require('../controller/adminController');
+const auctionController = require('../controller/auctionController');
 const router = express.Router();
 
-router.post('/emit', adminController.emit_message);
+router.post('/emit', auctionController.emit_message);
 
-router.post('/timer/reset', adminController.timer_reset);
+router.post('/timer/reset', auctionController.timer_reset);
 
-router.post('/timer/update', adminController.timer_update);
+router.post('/timer/start', auctionController.timer_start);
 
-router.post('/player/current', adminController.current_player);
+router.post('/player/current', auctionController.current_player);
 
 module.exports = router;

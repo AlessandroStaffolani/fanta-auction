@@ -56,6 +56,14 @@ db.once('disconnected', function () {
 //==============================================================================
 
 /**
+ * Server admin creation
+ */
+const adminUtils = require('./utils/adminUtils');
+adminUtils.adminCreation('admin');
+
+//==============================================================================
+
+/**
  *App Middlewares
  */
 
@@ -75,12 +83,15 @@ const index = require('./api/index');
 const auth = require('./api/auth');
 const publicRoute = require('./api/public');
 const authController = require('./controller/authController');
+const auction = require('./api/auction');
 const admin = require('./api/admin');
 
 app.use('/', index);
 app.use('/auth/', auth);
 app.use('/public/', publicRoute);
 app.use(authController.is_authenticated);
+app.use('/auction', auction);
+app.use(authController.is_admin);
 app.use('/admin', admin);
 
 //==============================================================================

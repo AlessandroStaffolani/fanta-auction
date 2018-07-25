@@ -16,13 +16,16 @@ body {
 
 .app-wrapper {
     min-height: 100vh;
+    height: 100%;
     background-color: rgba(33, 33, 33, 0.95);
     color: #ffffff;
 }
 
 .app-logo {
-    animation: app-logo-spin infinite 20s linear;
-    width: 46px;
+    /*animation: app-logo-spin infinite 20s linear;
+    width: 46px;*/
+    font-size: 1.8rem;
+    color: #28a745;
 }
 
 .navbar-nav {
@@ -59,11 +62,40 @@ a {
 }
 
 
+.btn-danger {
+    background-color: #b71c1c;
+    border-color: #b71c1c;
+}
+
+.btn-danger:hover {
+    background-color: #f44336;
+    border-color: #f44336;
+}
+
+.btn-danger:focus {
+    box-shadow: 0 0 0 0.2rem rgba(244, 67, 54, 0.5);
+}
+
+.custom-select.is-invalid, .form-control.is-invalid, .was-validated .custom-select:invalid, .was-validated .form-control:invalid {
+    border-color: #b71c1c;
+}
+
+.invalid-feedback {
+    color: #b71c1c;
+}
+
 @keyframes app-logo-spin {
     from {
         transform: rotate(0deg);
     }
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media only screen and (max-width: 330px) {
+
+    .navbar-brand {
+        font-size: 1.1rem;
     }
 }

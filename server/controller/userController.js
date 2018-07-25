@@ -5,6 +5,7 @@ const customValidator = require('../utils/customValidators');
 const jsonWebToken = require('../crypto/jsonWebToken');
 
 const User = require('../model/user');
+const DEFAULT_ROLE = 'user';
 
 /**
  * Find all users
@@ -49,7 +50,8 @@ exports.post_user = [
             // Data are correct, can save the object
             const user = new User({
                 username: req.body.user.username,
-                password: req.body.user.password
+                password: req.body.user.password,
+                role: DEFAULT_ROLE
             });
 
             save_user(req, res, next, user, requested_user, true);

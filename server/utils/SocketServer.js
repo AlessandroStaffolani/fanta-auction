@@ -21,7 +21,7 @@ const init = (server) => {
             });
         });
 
-        io.on('connection', function(socket){
+        io.on('connection', (socket) => {
             const token = socket.handshake.query.token;
             const user = jsonWebToken.getUserData(token);
             connectedClients[user._id] = socket;
@@ -29,6 +29,10 @@ const init = (server) => {
             console.log(newUserConnectedMessage);
             //sendAll('message', newUserConnectedMessage);
         });
+
+        io.on('close', () => {
+            console.log('user disconnected');
+        })
     }
 };
 
