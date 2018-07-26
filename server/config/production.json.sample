@@ -1,11 +1,5 @@
 {
-  "host": "localhost",
-  "devURL": "http://localhost:5000",
-  "socketHost": "localhost",
-  "socketPort": "5005",
-  "env": "development",
   "dbURL": "<db_url>",
-  "sessionSecret": "<session_secret>",
   "passwordConfig": {
     "hashBytes": 64,
     "saltBytes": 16,
