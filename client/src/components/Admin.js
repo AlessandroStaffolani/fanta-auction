@@ -24,6 +24,7 @@ class Admin extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmitCurrentPlayer = this.handleSubmitCurrentPlayer.bind(this);
         this.handleTimerButton = this.handleTimerButton.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     initSocketClient = (token) => {
@@ -38,7 +39,7 @@ class Admin extends React.Component {
 
     componentDidMount() {
         const { playersConnected } = this.state;
-        console.log(playersConnected);
+        this.handleTimerButton(undefined, 'reset');
         this.socketClient.on('playerConnected', player => {
             playersConnected.push(player.value);
             this.setState({
@@ -97,7 +98,9 @@ class Admin extends React.Component {
     };
 
     handleTimerButton = (event, type) => {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
         const path = SOCKET_PATH + '/admin/timer/' + type;
         const api_headers = new Headers();
         const token = getToken(this.props.username);
@@ -118,6 +121,12 @@ class Admin extends React.Component {
             })
             .then(result => console.log(result))
             .catch(err => console.log(err));
+    };
+
+    handleLogout = (event) => {
+        event.preventDefault();
+        this.socketClient.disconnect();
+        this.props.handleLogout(event);
     };
 
     render() {
@@ -214,7 +223,7 @@ class Admin extends React.Component {
                 <hr/>
                 <div className="form-row mt-4 justify-content-center">
                     <div className="col-12 col-md-4 col-lg-3 mb-5">
-                        <button className="btn btn-danger btn-block" onClick={handleLogout}>
+                        <button className="btn btn-danger btn-block" onClick={this.handleLogout}>
                             Logout
                         </button>
                     </div>

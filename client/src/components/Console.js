@@ -105,12 +105,12 @@ class Console extends Component {
                     </h1>
                     <hr/>
                     <div className="row mt-4 justify-content-center">
-                        {this.state.reservedBy ?
-                            <p className="player-wrapper player-reserved text-center">
-                                Player reserved: <span className="player"><b>{this.state.reservedBy}</b></span>
-                            </p>
-                            : ''}
                         <div className="col-12 col-md-8 order-md-12 mb-4 mb-md-0">
+                            {this.state.reservedBy ?
+                                <p className="player-wrapper player-reserved text-center">
+                                    Player reserved: <span className="player"><b>{this.state.reservedBy}</b></span>
+                                </p>
+                                : ''}
                             <Timer time={this.state.time}/>
                             <Button disabled={this.state.buttonDisabled} handleClick={this.handleButtonClick}/>
                         </div>
