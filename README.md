@@ -58,4 +58,4 @@ yarn start
 - Alessandro Staffolani \- *github: ale8193*
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/ale8193/fanta-auction/blob/master/LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE) file for details
