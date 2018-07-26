@@ -1,16 +1,16 @@
 
 const USER_TOKEN_KEY = 'user_token';
 
-const setToken = (token) => {
-    localStorage.setItem(USER_TOKEN_KEY, token);
+const setToken = (username, token) => {
+    localStorage.setItem(username, token);
 };
 
-const getToken = () => {
-    return localStorage.getItem(USER_TOKEN_KEY);
+const getToken = (username) => {
+    return localStorage.getItem(username);
 };
 
-const removeToken = () => {
-    localStorage.removeItem(USER_TOKEN_KEY);
+const removeToken = (username) => {
+    localStorage.removeItem(username);
 };
 
 export {

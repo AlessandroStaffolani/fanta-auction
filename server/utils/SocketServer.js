@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const jsonWebToken = require('../crypto/jsonWebToken');
 
 const connectedClients = {};
+let adminClient = undefined;
 let io = undefined;
 
 const init = (server) => {
@@ -24,8 +25,17 @@ const init = (server) => {
         io.on('connection', (socket) => {
             const token = socket.handshake.query.token;
             const user = jsonWebToken.getUserData(token);
-            connectedClients[user._id] = socket;
-            let newUserConnectedMessage = "User connected: " + user.username;
+            let newUserConnectedMessage = '';
+            if (user.role === 'admin') {
+                newUserConnectedMessage = "Admin connected";
+                adminClient = socket;
+            } else {
+                connectedClients[user._id] = socket;
+                newUserConnectedMessage = "User connected: " + user.username;
+                if (adminClient) {
+                    sendAdmin('playerConnected', user.username)
+                }
+            }
             console.log(newUserConnectedMessage);
             //sendAll('message', newUserConnectedMessage);
         });
@@ -45,9 +55,16 @@ const sendAll = (type, value) => {
     })
 };
 
+const sendAdmin = (type, value) => {
+    adminClient.emit(type, {
+        value: value
+    })
+};
+
 module.exports = {
     init: init,
-    sendAll: sendAll
+    sendAll: sendAll,
+    sendAdmin: sendAdmin,
 };
 
 /*function SocketServer(server) {

@@ -5,8 +5,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Loading from './components/Loading';
 import {validateRequiredInput} from "./utils/validation";
-import { setToken, getToken, removeToken } from './utils/localStorageUtils';
+import { setToken, removeToken } from './utils/localStorageUtils';
 import config from './config/config';
+import Admin from "./components/Admin";
 
 const APPLICATION_API_HOST = config.serverPath;
 const API_HEADERS = new Headers();
@@ -40,7 +41,8 @@ class App extends Component {
                 errorMsg: '',
                 value: '',
             },
-            currentPage: 'home'
+            currentPage: 'home',
+            isAdmin: false,
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -120,7 +122,7 @@ class App extends Component {
                     })
                 } else {
                     if (result.token) {
-                        setToken(result.token);
+                        setToken(result.username, result.token);
                         this.setState({
                             username: {
                                 className: 'form-control',
@@ -147,7 +149,8 @@ class App extends Component {
                                 username: result.username
                             },
                             isLoading: false,
-                            title: 'Fanta Auction - Console'
+                            title: 'Fanta Auction - Console',
+                            isAdmin: result.role === 'admin'
                         });
                     }
                 }
@@ -159,6 +162,7 @@ class App extends Component {
 
     handleLogoutClick = (event) => {
         event.preventDefault();
+        removeToken(this.state.userLogged.username);
         this.setState({
             title: 'Fanta Auction',
             isLoading: false,
@@ -186,7 +190,6 @@ class App extends Component {
             },
             currentPage: 'home'
         });
-        removeToken();
     };
 
     handleLinkClick = (event, page) => {
@@ -301,7 +304,7 @@ class App extends Component {
                         this.setState(state);
                     })
                 } else {
-                    setToken(result.token);
+                    setToken(result.username, result.token);
                     this.setState({
                         username: {
                             className: 'form-control',
@@ -339,7 +342,7 @@ class App extends Component {
     };
 
     render() {
-        const { currentPage, userLogged } = this.state;
+        const { currentPage, userLogged, isAdmin } = this.state;
         let content = <Login
             username={this.state.username}
             password={this.state.password}
@@ -355,8 +358,10 @@ class App extends Component {
                 handleSubmit={this.handleSubmit}
                 handleLinkClick={this.handleLinkClick}
             />;
-            if (userLogged) {
+            if (userLogged && !isAdmin) {
                 content = <Console handleLogout={this.handleLogoutClick} username={this.state.userLogged.username}/>
+            } else if (userLogged && isAdmin) {
+                content = <Admin handleLogout={this.handleLogoutClick} username={this.state.userLogged.username}/>
             }
         } else if (currentPage === 'register' && !userLogged) {
             content = <Register

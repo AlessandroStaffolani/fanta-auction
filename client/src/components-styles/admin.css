@@ -1,0 +1,9 @@
+
+.username {
+    text-transform: capitalize;
+}
+
+li.item {
+    list-style: none;
+    font-size: 1.2rem;
+}

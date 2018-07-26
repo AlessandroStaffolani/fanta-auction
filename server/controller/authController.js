@@ -37,6 +37,7 @@ exports.login = [
                                         authenticate: true,
                                         userId: user.id,
                                         username: user.username,
+                                        role: user.role,
                                         token: jsonWebToken.generateToken(user),
                                     })
                                 } else {

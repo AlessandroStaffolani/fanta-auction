@@ -12,7 +12,7 @@ class Console extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            userToken: getToken(),
+            userToken: getToken(props.username),
             currentPlayer: '',
             reservedBy: false,
             time: 5,
@@ -67,7 +67,7 @@ class Console extends Component {
         event.preventDefault();
         const path = SOCKET_PATH + '/auction/reserve';
         const api_headers = new Headers();
-        const token = getToken();
+        const token = getToken(this.props.username);
         api_headers.append('Accept', 'application/json');
         api_headers.append('Content-Type', 'application/json');
         api_headers.append('Authorization', `Bearer ${token}`);
@@ -95,7 +95,7 @@ class Console extends Component {
 
     render() {
         const { username } = this.props;
-        console.log(getToken());
+        //console.log(getToken(username));
 
         return (
             <div tabIndex={0}>
@@ -106,8 +106,8 @@ class Console extends Component {
                     <hr/>
                     <div className="row mt-4 justify-content-center">
                         {this.state.reservedBy ?
-                            <p className="player-wrapper text-center">
-                                User reserved: <span className="player"><b>{this.state.reservedBy}</b></span>
+                            <p className="player-wrapper player-reserved text-center">
+                                Player reserved: <span className="player"><b>{this.state.reservedBy}</b></span>
                             </p>
                             : ''}
                         <div className="col-12 col-md-8 order-md-12 mb-4 mb-md-0">
