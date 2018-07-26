@@ -38,12 +38,11 @@ class Admin extends React.Component {
     };
 
     componentDidMount() {
-        const { playersConnected } = this.state;
         this.handleTimerButton(undefined, 'reset');
-        this.socketClient.on('playerConnected', player => {
-            playersConnected.push(player.value);
+        this.socketClient.on('playerConnected', players => {
+            console.log(players);
             this.setState({
-                playersConnected: playersConnected
+                playersConnected: players.value
             })
         });
 
