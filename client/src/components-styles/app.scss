@@ -1,0 +1,198 @@
+
+@import "variables";
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap-grid";
+@import "bootstrap/scss/bootstrap-reboot";
+
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Orbitron', sans-serif;
+}
+
+:focus {
+  outline: none;
+}
+
+.navbar {
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  background-color: rgba(33, 33, 33, 0.95) !important;
+
+  .app-logo {
+    /*animation: app-logo-spin infinite 20s linear;
+    width: 46px;*/
+    font-size: 1.8rem;
+    color: #28a745;
+  }
+
+  .navbar-nav {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+  }
+}
+
+.app-wrapper {
+  min-height: 100vh;
+  height: 100%;
+  background-color: rgba(33, 33, 33, 0.95);
+  color: #ffffff;
+}
+
+.loading {
+  color: #28a745;
+  text-align: center;
+  margin-top: 200px;
+}
+
+.form-help {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+}
+
+hr {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/*a {
+  color: #28a745;
+}
+
+.form-control:focus {
+  border-color: #94d3a2;
+  box-shadow: 0 0 0 0.2rem rgba(148, 211, 162, 0.25);
+}*/
+
+.player-wrapper {
+  font-size: 1.3rem;
+}
+
+.btn {
+  text-transform: uppercase;
+}
+
+/*.btn-danger {
+  background-color: #b71c1c;
+  border-color: #b71c1c;
+}
+
+.btn-danger:hover {
+  background-color: #f44336;
+  border-color: #f44336;
+}
+
+.btn-danger:focus {
+  box-shadow: 0 0 0 0.2rem rgba(244, 67, 54, 0.5);
+}
+
+.custom-select.is-invalid, .form-control.is-invalid, .was-validated .custom-select:invalid, .was-validated .form-control:invalid {
+  border-color: #b71c1c;
+}
+
+.invalid-feedback {
+  color: #b71c1c;
+}*/
+
+.player-reserved {
+  color: lighten($red, 11%);
+}
+
+.username, .player {
+  text-transform: capitalize;
+}
+
+li.item {
+  list-style: none;
+  font-size: 1.2rem;
+}
+
+.login-wrapper {
+  padding: 20px;
+}
+
+/*
+  SPECIAL BUTTON STYLE
+*/
+
+
+.button-wrapper {
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.button-shadow {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 100%;
+  border-color: transparent;
+  width: 270px;
+  height: 270px;
+  z-index: 100;
+  position: relative;
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.button-shadow:focus, .button-shadow:active {
+  outline: none;
+  background-color: $red;
+}
+
+.button-content {
+  background-color: lighten($red, 11%);;
+  border-radius: 100%;
+  width: 250px;
+  height: 250px;
+  margin: 0 auto;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}
+
+.button-shadow:active .button-content {
+  background-color: lighten($red, 20%);;
+}
+
+.button-shadow:disabled, .button-shadow:disabled:active {
+  opacity: 0.5;
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: default;
+}
+
+.button-shadow:disabled .button-content, .button-shadow:disabled:active .button-content {
+  opacity: 0.5;
+  background-color: lighten($red, 11%);;
+}
+
+/*
+  TIMER STYLE
+ */
+
+.timer-wrapper {
+  text-align: center;
+}
+
+.time {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 4rem;
+}
+
+@keyframes app-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 330px) {
+
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+}

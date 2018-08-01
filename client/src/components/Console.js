@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import '../components-styles/console.css';
 import SocketIoClient from 'socket.io-client';
 import { getToken } from '../utils/localStorageUtils';
 import config from '../config/config';

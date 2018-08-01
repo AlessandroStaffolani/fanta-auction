@@ -1,11 +1,29 @@
 import React from 'react';
-import '../components-styles/admin.css';
 import { getToken } from '../utils/localStorageUtils';
 import config from "../config/config";
 import SocketIoClient from "socket.io-client";
 import Timer from './Timer';
 
 const SOCKET_PATH = config.serverPath;
+
+const PLAYER_ROLE = [
+    {
+        code: 'goalkeeper',
+        label: 'Portieri'
+    },
+    {
+        code: 'defender',
+        label: 'Difensori'
+    },
+    {
+        code: 'midfielder',
+        label: 'Centrocampisti'
+    },
+    {
+        code: 'forward',
+        label: 'Attaccanti'
+    }
+];
 
 class Admin extends React.Component {
     constructor(props) {
@@ -17,6 +35,7 @@ class Admin extends React.Component {
             currentPlayer: false,
             playersConnected: [],
             playerReserved: false,
+            file: null,
         };
 
         this.initSocketClient(this.state.adminToken);
@@ -201,6 +220,21 @@ class Admin extends React.Component {
                     </div>
                 </form>
                 <hr/>
+                <div className="form-row my-4 align-items-center justify-content-between">
+                    <div className="col-12 col-md-6">
+                        <div className="custom-file">
+                            <input type="file" className="custom-file-input" id="playerFile" name="playerFile" />
+                            <label className="custom-file-label" htmlFor="playerFile">Load player file</label>
+                            <small className="form-text text-muted">Load the player from your csv file</small>
+                        </div>
+                    </div>
+                    <div className="col-12 col-md-6">
+                        <select className="custom-select">
+                            <option selected>Player role</option>
+                            {PLAYER_ROLE.map((role, index) => <option key={index} value={role.code}>{role.label}</option> )}
+                        </select>
+                    </div>
+                </div>
                 <div className="form-row my-4 justify-content-between">
                     <div className="col-12 col-md-6 text-center">
                         <h3>Players connected</h3>
