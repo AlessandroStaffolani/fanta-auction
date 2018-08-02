@@ -7842,6 +7842,25 @@ li.item {
   font-family: 'Orbitron', sans-serif;
   font-size: 4rem; }
 
+.custom-file-label {
+  border-color: #28a745; }
+  .custom-file-label::after {
+    border-color: #28a745;
+    color: #ffffff;
+    background-color: #28a745; }
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important; }
+  .text-muted.with-error {
+    color: #b71c1c !important;
+    opacity: 1; }
+
+.custom-select.with-error {
+  box-shadow: 0px 0px 2px 4px #b71c1c; }
+
+.table-dark {
+  background-color: transparent; }
+
 @keyframes app-logo-spin {
   from {
     transform: rotate(0deg); }

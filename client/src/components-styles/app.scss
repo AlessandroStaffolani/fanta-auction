@@ -181,6 +181,36 @@ li.item {
   font-size: 4rem;
 }
 
+.custom-file-label {
+  border-color: $primary;
+
+  &::after {
+    border-color: $primary;
+    color: #ffffff;
+    background-color: $primary;
+  }
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+
+  &.with-error {
+    color: $danger !important;
+    opacity: 1;
+  }
+}
+
+.custom-select {
+
+  &.with-error {
+    box-shadow: 0px 0px 2px 4px $red;
+  }
+}
+
+.table-dark {
+  background-color: transparent;
+}
+
 @keyframes app-logo-spin {
   from {
     transform: rotate(0deg);

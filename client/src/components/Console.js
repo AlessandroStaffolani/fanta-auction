@@ -4,6 +4,7 @@ import { getToken } from '../utils/localStorageUtils';
 import config from '../config/config';
 import Button from "./Button";
 import Timer from "./Timer";
+import PlayerStatus from "./PlayerStatus";
 
 const SOCKET_PATH = config.serverPath;
 
@@ -117,8 +118,9 @@ class Console extends Component {
                     <div className="row mt-4 justify-content-center">
                         <div className="col-12 col-md-4">
                             <p className="player-wrapper text-center">
-                                Current player: <span className="player"><b>{this.state.currentPlayer}</b></span>
+                                Current player:
                             </p>
+                            {this.state.currentPlayer !== '' ? <PlayerStatus playerData={this.state.currentPlayer}/> : ''}
                         </div>
                     </div>
                     <div className="row mt-4 justify-content-center">
