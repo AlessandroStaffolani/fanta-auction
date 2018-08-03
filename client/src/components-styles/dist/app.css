@@ -7861,6 +7861,13 @@ li.item {
 .table-dark {
   background-color: transparent; }
 
+.offer-wrapper {
+  margin: 0 auto; }
+  .offer-wrapper .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle; }
+
 @keyframes app-logo-spin {
   from {
     transform: rotate(0deg); }

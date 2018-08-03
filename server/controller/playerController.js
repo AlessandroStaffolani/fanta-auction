@@ -58,10 +58,10 @@ exports.next_player = [
         if (abstractController.body_is_valid(req, res, next, playerRole)) {
 
             Player.findOne({role: playerRole}, null, {sort: {player: 1}})
+                .populate('currentOwner')
                 .then(player => {
-                    console.log(player);
 
-                    SocketServer.sendAll('message', player);
+                    SocketServer.sendAll('currentPlayer', player);
                     SocketServer.sendAdmin('currentPlayer', player);
 
                     abstractController.return_request(req, res, next, {

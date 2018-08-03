@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import Console from './components/Console';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -146,7 +145,8 @@ class App extends Component {
                             },
                             userLogged: {
                                 id: result.userId,
-                                username: result.username
+                                username: result.username,
+                                wallet: result.wallet
                             },
                             isLoading: false,
                             title: 'Fanta Auction - Console',
@@ -328,7 +328,8 @@ class App extends Component {
                         },
                         userLogged: {
                             id: result.user._id.toString(),
-                            username: result.user.username
+                            username: result.user.username,
+                            wallet: result.user.wallet
                         },
                         isLoading: false,
                         title: 'Fanta Auction - Console',
@@ -359,7 +360,7 @@ class App extends Component {
                 handleLinkClick={this.handleLinkClick}
             />;
             if (userLogged && !isAdmin) {
-                content = <Console handleLogout={this.handleLogoutClick} username={this.state.userLogged.username}/>
+                content = <Console handleLogout={this.handleLogoutClick} username={this.state.userLogged.username} wallet={this.state.userLogged.wallet}/>
             } else if (userLogged && isAdmin) {
                 content = <Admin handleLogout={this.handleLogoutClick} username={this.state.userLogged.username}/>
             }

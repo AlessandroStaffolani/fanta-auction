@@ -6,6 +6,7 @@ import Timer from './Timer';
 import { readInputFile, reformatCsvData } from '../utils/csvUtility';
 import Papa from "papaparse";
 import PlayerStatus from "./PlayerStatus";
+import Offer from "./Offer";
 
 const SOCKET_PATH = config.serverPath;
 
@@ -36,6 +37,7 @@ class Admin extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            showTimer: false,
             time: 5,
             adminToken: getToken(props.username),
             playerRole: 'default',
@@ -47,16 +49,23 @@ class Admin extends React.Component {
             playerRoleLoad: 'default',
             fileFormValid: true,
             loadSuccess: false,
-            playerRoleClass: 'custom-select'
+            playerRoleClass: 'custom-select my-2',
+            infoMessage: false,
+            showPlayerOffer: false,
+            playerOffer: 0,
+            userTyping: null,
         };
 
         this.initSocketClient(this.state.adminToken);
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmitNextPlayer = this.handleSubmitNextPlayer.bind(this);
+        this.handleInitClick = this.handleInitClick.bind(this);
         this.handleTimerButton = this.handleTimerButton.bind(this);
         this.handleFileInput = this.handleFileInput.bind(this);
         this.handleLoadClick = this.handleLoadClick.bind(this);
+        this.handleChangeOffer = this.handleChangeOffer.bind(this);
+        this.handleSubmitOffer = this.handleSubmitOffer.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
 
@@ -71,7 +80,14 @@ class Admin extends React.Component {
     };
 
     componentDidMount() {
-        this.handleTimerButton(undefined, 'reset');
+        //this.handleTimerButton(undefined, 'reset');
+
+        this.socketClient.on('initAuction', message => {
+            this.setState({
+                infoMessage: message.value
+            })
+        });
+
         this.socketClient.on('playerConnected', players => {
             console.log(players);
             this.setState({
@@ -85,6 +101,21 @@ class Admin extends React.Component {
             })
         });
 
+        this.socketClient.on('playerOffer', message => {
+            this.setState({
+                showPlayerOffer: message.value.value,
+                showTimer: false,
+                infoMessage: message.value.username + ' is typing is offer',
+                userTyping: message.value.username
+            })
+        });
+
+        this.socketClient.on('playerTyping', message => {
+            this.setState({
+                playerOffer: message.value
+            })
+        });
+
         this.socketClient.on('playerReserved', player => {
             this.setState({
                 playerReserved: player.value
@@ -92,8 +123,12 @@ class Admin extends React.Component {
         });
 
         this.socketClient.on('timer', message => {
+            console.log(message);
             this.setState({
                 time: message.value,
+                showTimer: true,
+                infoMessage: false,
+                showPlayerOffer: false
             })
         });
     }
@@ -103,7 +138,7 @@ class Admin extends React.Component {
         let obj = {};
         obj[filed] = event.target.value;
         obj['fileFormValid'] = true;
-        obj['playerRoleClass'] = 'custom-select';
+        obj['playerRoleClass'] = 'custom-select my-2';
         this.setState(obj);
     };
 
@@ -113,7 +148,7 @@ class Admin extends React.Component {
 
         if (playerRole === 'default') {
             this.setState({
-                playerRoleClass: 'custom-select with-error'
+                playerRoleClass: 'custom-select my-2 with-error'
             })
         } else {
             const path = SOCKET_PATH + '/admin/player/next';
@@ -136,7 +171,35 @@ class Admin extends React.Component {
                 })
                 .then(result => {
                     console.log(result);
+                    this.setState({
+                        playerRoleClass: 'custom-select my-2'
+                    })
                 })
+                .catch(err => console.log(err));
+        }
+    };
+
+    handleInitClick = (event) => {
+        event.preventDefault();
+        const { playerRole, currentPlayer } = this.state;
+
+        if (playerRole === 'default' || !currentPlayer) {
+            this.setState({
+                playerRoleClass: 'custom-select my-2 with-error'
+            })
+        } else {
+            const path = SOCKET_PATH + '/admin/auction/init';
+            const api_headers = new Headers();
+            const token = getToken(this.props.username);
+            api_headers.append('Accept', 'application/json');
+            api_headers.append('Content-Type', 'application/json');
+            api_headers.append('Authorization', `Bearer ${token}`);
+            fetch(path, {
+                method: 'POST',
+                headers: api_headers,
+                body: JSON.stringify({playerRole: this.props.username}),
+            })
+                .then(result => console.log(result))
                 .catch(err => console.log(err));
         }
     };
@@ -163,7 +226,14 @@ class Admin extends React.Component {
                     console.log(result);
                 }
             })
-            .then(result => console.log(result))
+            .then(result => {
+                console.log(result);
+                if (type === 'start') {
+                    this.setState({showTimer: true})
+                } else {
+                    this.setState({showTimer: false})
+                }
+            })
             .catch(err => console.log(err));
     };
 
@@ -230,6 +300,46 @@ class Admin extends React.Component {
         }
     };
 
+    handleChangeOffer = (event) => {
+        event.preventDefault();
+        const offerValue = event.target.value;
+        this.socketClient.emit('playerTyping', {value: offerValue});
+        this.setState({
+            playerOffer: offerValue
+        });
+    };
+
+    handleSubmitOffer = (event) => {
+        event.preventDefault();
+        const { playerOffer, currentPlayer } = this.state;
+        let offer = playerOffer.replace(',', '.');
+        if (offer && !isNaN(offer)) {
+            const path = SOCKET_PATH + '/auction/reserve/' + currentPlayer._id;
+            const api_headers = new Headers();
+            const token = getToken(this.props.username);
+            api_headers.append('Accept', 'application/json');
+            api_headers.append('Content-Type', 'application/json');
+            api_headers.append('Authorization', `Bearer ${token}`);
+            fetch(path, {
+                method: 'POST',
+                headers: api_headers,
+                body: JSON.stringify({
+                    user: this.state.userTyping,
+                    offer: offer
+                }),
+            })
+                .then(result => {
+                    if (result.status === 200) {
+                        return result;
+                    } else {
+                        console.log(result);
+                    }
+                })
+                .then(result => console.log(result))
+                .catch(err => console.log(err));
+        }
+    };
+
     handleLogout = (event) => {
         event.preventDefault();
         this.socketClient.disconnect();
@@ -237,20 +347,24 @@ class Admin extends React.Component {
     };
 
     render() {
-        const { username, handleLogout } = this.props;
+        const { username } = this.props;
 
         return (
             <div className="admin-wrapper">
                 <h1 className="text-center text-sm-left">
                     <span className="username">{username}</span>
                 </h1>
-                <hr/>
+                {this.state.infoMessage || this.state.showTimer || this.state.currentPlayer ? <hr/> : ''}
                 <div className="form-row my-4 justify-content-center">
                     <div className="col-12 col-md-10 col-lg-8 text-center">
-                        {this.state.playerReserved ?
-                            <h2 className="player-reserved">Player reserved: <span className="username">{this.state.playerReserved}</span></h2>
-                            : ''}
-                        <Timer time={this.state.time}/>
+                        {this.state.infoMessage ? <h2 className="player-reserved">{this.state.infoMessage}</h2> : ''}
+                        {this.state.showTimer ? <Timer time={this.state.time}/> :
+                            this.state.showPlayerOffer ? <Offer
+                                offer={this.state.playerOffer}
+                                handleChange={this.handleChangeOffer}
+                                handleSubmit={this.handleSubmitOffer}
+                            /> : ''
+                        }
                         {this.state.currentPlayer ?
                             <div>
                                 <h3>Current Player</h3>
@@ -267,9 +381,9 @@ class Admin extends React.Component {
                             <div className="col-12 col-md-8 col-lg-6">
                                 <button
                                     className="btn btn-success btn-block my-2"
-                                    onClick={event => this.handleTimerButton(event, 'start')}
+                                    onClick={this.handleInitClick}
                                 >
-                                    Start
+                                    Init
                                 </button>
                             </div>
                         </div>
@@ -315,7 +429,7 @@ class Admin extends React.Component {
                 </form>
                 <hr/>
                 <div className="form-row my-4 justify-content-between">
-                    <div className="col-12 col-md-6 offset-3 text-center">
+                    <div className="col-12 col-md-6 offset-md-3 text-center">
                         <h3>Players connected</h3>
                         <ul>
                             {this.state.playersConnected.map((player, index) =>
@@ -342,7 +456,7 @@ class Admin extends React.Component {
                         <div className="form-row justify-content-center">
                             <div className="col-12 col-md-8 col-lg-6">
                                 <div className="custom-file">
-                                    <input type="file" className="custom-file-input" id="playerFile" name="playerFile" accept=".csv" onChange={this.handleFileInput} />
+                                    <input type="file" className="custom-file-input my-2" id="playerFile" name="playerFile" accept=".csv" onChange={this.handleFileInput} />
                                     <label className="custom-file-label" htmlFor="playerFile">{this.state.fileLabel}</label>
                                 </div>
                             </div>
@@ -351,7 +465,7 @@ class Admin extends React.Component {
                     <div className="col-12 col-md-6">
                         <div className="form-row justify-content-center">
                             <div className="col-12 col-md-8 col-lg-6">
-                                <select value={this.state.playerRoleLoad} onChange={(event) => this.handleChange(event, 'playerRoleLoad')} className="custom-select">
+                                <select value={this.state.playerRoleLoad} onChange={(event) => this.handleChange(event, 'playerRoleLoad')} className="custom-select my-2">
                                     <option value="default">Player role</option>
                                     {PLAYER_ROLE.map((role, index) => <option key={index} value={role.code}>{role.label}</option> )}
                                 </select>
@@ -361,12 +475,12 @@ class Admin extends React.Component {
                 </div>
                 <div className="form-row mt-4 justify-content-center">
                     <div className="col-12 col-md-4 col-lg-3">
-                        <small className={this.state.fileFormValid ? 'form-help text-muted' : 'form-help text-muted with-error'}>
+                        <small className={this.state.fileFormValid ? 'form-help text-muted my-2' : 'form-help my-2 text-muted with-error'}>
                             Load player from csv and select the player role before load
                         </small>
                     </div>
                     <div className="col-12 col-md-4 col-lg-3 offset-lg-3 offset-md-2">
-                        <button className="btn btn-success btn-block" onClick={this.handleLoadClick}>
+                        <button className="btn btn-success btn-block my-2" onClick={this.handleLoadClick}>
                             Load
                         </button>
                     </div>

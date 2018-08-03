@@ -29,7 +29,15 @@ const init = (server) => {
             if (user.role === 'admin') {
                 newUserConnectedMessage = "Admin connected";
                 adminClient = socket;
+                socket.on('playerTyping', (message) => {
+                    sendAll('playerTyping', message.value);
+                    sendAdmin('playerTyping', message.value);
+                });
             } else {
+                socket.on('playerTyping', (message) => {
+                    sendAll('playerTyping', message.value);
+                    sendAdmin('playerTyping', message.value);
+                });
                 connectedClients[user.username] = socket;
                 newUserConnectedMessage = "User connected: " + user.username;
                 if (adminClient) {

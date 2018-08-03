@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.post('/emit', auctionController.emit_message);
 
+router.post('/auction/init', auctionController.init_auction_player);
+
 router.post('/timer/reset', auctionController.timer_reset);
 
 router.post('/timer/start', auctionController.timer_start);

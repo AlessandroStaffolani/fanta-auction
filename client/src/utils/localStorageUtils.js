@@ -1,6 +1,4 @@
 
-const USER_TOKEN_KEY = 'user_token';
-
 const setToken = (username, token) => {
     localStorage.setItem(username, token);
 };

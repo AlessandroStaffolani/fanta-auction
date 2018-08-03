@@ -8,13 +8,19 @@ const PLAYER_ROLE = {
 };
 
 class PlayerStatus extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            offerField: false
+        }
+    }
 
     render() {
         const { playerData } = this.props;
-
+        console.log(playerData);
 
         return (
-            <table className="table table-dark table-hover">
+            <table className="table table-dark table-hover text-center">
                 <tbody>
                     <tr>
                         <th>
@@ -53,7 +59,7 @@ class PlayerStatus extends React.Component {
                             Current Owner:
                         </th>
                         <td>
-                            {playerData.currentOwner}
+                            {playerData.currentOwner ? playerData.currentOwner.username : ''}
                         </td>
                     </tr>
                 </tbody>

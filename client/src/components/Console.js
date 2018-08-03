@@ -5,6 +5,7 @@ import config from '../config/config';
 import Button from "./Button";
 import Timer from "./Timer";
 import PlayerStatus from "./PlayerStatus";
+import Offer from "./Offer";
 
 const SOCKET_PATH = config.serverPath;
 
@@ -15,20 +16,37 @@ class Console extends Component {
             userToken: getToken(props.username),
             currentPlayer: '',
             reservedBy: false,
+            showTimer: false,
             time: 5,
             buttonDisabled: true,
+            playerOffer: 0,
+            showOfferForm: false,
+            infoMessage: false,
         };
         this.initSocketClient(this.state.userToken);
 
         this.handleButtonClick = this.handleButtonClick.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+        this.handleChangeOffer = this.handleChangeOffer.bind(this);
+        this.handleSubmitOffer = this.handleSubmitOffer.bind(this);
     }
 
     componentDidMount() {
         this.socketClient.on('message', message => {
             console.log(message);
+        });
+
+        this.socketClient.on('currentPlayer', message => {
+            console.log(message);
             this.setState({
                 currentPlayer: message.value
+            })
+        });
+
+        this.socketClient.on('initAuction', message => {
+            console.log(message);
+            this.setState({
+                buttonDisabled: false
             })
         });
 
@@ -36,7 +54,22 @@ class Console extends Component {
             console.log(message);
             this.setState({
                 time: message.value,
+                showTimer: true,
+                showOfferForm: false,
                 buttonDisabled: false
+            })
+        });
+
+        this.socketClient.on('playerOffer', message => {
+            this.setState({
+                buttonDisabled: message.value.value,
+                infoMessage: message.value.username + ' is typing is offer'
+            })
+        });
+
+        this.socketClient.on('playerTyping', message => {
+            this.setState({
+                playerOffer: message.value
             })
         });
 
@@ -65,7 +98,7 @@ class Console extends Component {
 
     handleButtonClick = (event) => {
         event.preventDefault();
-        const path = SOCKET_PATH + '/auction/reserve';
+        const path = SOCKET_PATH + '/auction/player/offer';
         const api_headers = new Headers();
         const token = getToken(this.props.username);
         api_headers.append('Accept', 'application/json');
@@ -74,7 +107,9 @@ class Console extends Component {
         fetch(path, {
             method: 'POST',
             headers: api_headers,
-            body: JSON.stringify({user: this.props.username}),
+            body: JSON.stringify({
+                user: this.props.username,
+            }),
         })
             .then(result => {
                 if (result.status === 200) {
@@ -83,8 +118,53 @@ class Console extends Component {
                     console.log(result);
                 }
             })
-            .then(result => console.log(result))
+            .then(result => {
+                console.log(result);
+                this.setState({
+                    showOfferForm: true,
+                });
+            })
             .catch(err => console.log(err));
+    };
+
+    handleChangeOffer = (event) => {
+        event.preventDefault();
+        const offerValue = event.target.value;
+        this.socketClient.emit('playerTyping', {value: offerValue});
+        this.setState({
+            playerOffer: offerValue
+        });
+    };
+
+    handleSubmitOffer = (event) => {
+        event.preventDefault();
+        const { playerOffer, currentPlayer } = this.state;
+        let offer = playerOffer.replace(',', '.');
+        if (offer && !isNaN(offer)) {
+            const path = SOCKET_PATH + '/auction/reserve/' + currentPlayer._id;
+            const api_headers = new Headers();
+            const token = getToken(this.props.username);
+            api_headers.append('Accept', 'application/json');
+            api_headers.append('Content-Type', 'application/json');
+            api_headers.append('Authorization', `Bearer ${token}`);
+            fetch(path, {
+                method: 'POST',
+                headers: api_headers,
+                body: JSON.stringify({
+                    user: this.props.username,
+                    offer: offer
+                }),
+            })
+                .then(result => {
+                    if (result.status === 200) {
+                        return result;
+                    } else {
+                        console.log(result);
+                    }
+                })
+                .then(result => console.log(result))
+                .catch(err => console.log(err));
+        }
     };
 
     handleLogout = (event) => {
@@ -94,7 +174,7 @@ class Console extends Component {
     };
 
     render() {
-        const { username } = this.props;
+        const { username, wallet } = this.props;
         //console.log(getToken(username));
 
         return (
@@ -104,15 +184,22 @@ class Console extends Component {
                         <span className="username">{username}</span>
                     </h1>
                     <hr/>
+                    <h5 className="text-center text-sm-left">Wallet: {wallet}</h5>
+                    <hr/>
                     <div className="row mt-4 justify-content-center">
                         <div className="col-12 col-md-8 order-md-12 mb-4 mb-md-0">
+                            {this.state.infoMessage ? <p className="player-wrapper player-reserved text-center">{this.state.infoMessage}</p> : ''}
                             {this.state.reservedBy ?
                                 <p className="player-wrapper player-reserved text-center">
                                     Player reserved: <span className="player"><b>{this.state.reservedBy}</b></span>
                                 </p>
                                 : ''}
-                            <Timer time={this.state.time}/>
-                            <Button disabled={this.state.buttonDisabled} handleClick={this.handleButtonClick}/>
+                            {this.state.showTimer ? <Timer time={this.state.time}/> : ''}
+                            {this.state.showOfferForm ?
+                                <Offer offer={this.state.playerOffer} handleChange={this.handleChangeOffer} handleSubmit={this.handleSubmitOffer}/>
+                                :
+                                <Button disabled={this.state.buttonDisabled} handleClick={this.handleButtonClick}/>
+                            }
                         </div>
                     </div>
                     <div className="row mt-4 justify-content-center">

@@ -9,7 +9,8 @@ let UserSchema = new Schema(
         password: {type: String, required: true},
         salt: {type: String},
         created_at: {type: Date, default: Date.now()},
-        role: {type: String, enum: ['user', 'admin'], default: 'user'}
+        role: {type: String, enum: ['user', 'admin'], default: 'user'},
+        wallet: {type: Number, default: 100},
     }
 );
 

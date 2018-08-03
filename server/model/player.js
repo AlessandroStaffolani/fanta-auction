@@ -32,13 +32,15 @@ let PlayerSchema = new Schema(
             default: 0
         },
         currentOwner: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'User'
         },
-        finalOffer: {
+            finalOffer: {
             type: Number
         },
         finalOwner: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'User'
         },
     }
 );

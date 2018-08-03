@@ -38,6 +38,7 @@ exports.login = [
                                         userId: user.id,
                                         username: user.username,
                                         role: user.role,
+                                        wallet: user.wallet,
                                         token: jsonWebToken.generateToken(user),
                                     })
                                 } else {
