@@ -221,6 +221,16 @@ li.item {
   }
 }
 
+.table-with-caption {
+  font-size: 0.8rem;
+
+  caption {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.5);
+    caption-side: top;
+  }
+}
+
 @keyframes app-logo-spin {
   from {
     transform: rotate(0deg);

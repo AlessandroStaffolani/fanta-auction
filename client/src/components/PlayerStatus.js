@@ -17,10 +17,9 @@ class PlayerStatus extends React.Component {
 
     render() {
         const { playerData } = this.props;
-        console.log(playerData);
 
         return (
-            <table className="table table-dark table-hover text-center">
+            <table className="table table-dark table-hover text-center mb-5">
                 <tbody>
                     <tr>
                         <th>

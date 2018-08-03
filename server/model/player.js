@@ -35,7 +35,7 @@ let PlayerSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User'
         },
-            finalOffer: {
+        finalOffer: {
             type: Number
         },
         finalOwner: {

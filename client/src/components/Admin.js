@@ -43,7 +43,6 @@ class Admin extends React.Component {
             playerRole: 'default',
             currentPlayer: false,
             playersConnected: [],
-            playerReserved: false,
             file: null,
             fileLabel: 'Load player file',
             playerRoleLoad: 'default',
@@ -54,6 +53,8 @@ class Admin extends React.Component {
             showPlayerOffer: false,
             playerOffer: 0,
             userTyping: null,
+            offerError: null,
+            noMorePlayer: false,
         };
 
         this.initSocketClient(this.state.adminToken);
@@ -61,7 +62,7 @@ class Admin extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmitNextPlayer = this.handleSubmitNextPlayer.bind(this);
         this.handleInitClick = this.handleInitClick.bind(this);
-        this.handleTimerButton = this.handleTimerButton.bind(this);
+        this.handleResetButton = this.handleResetButton.bind(this);
         this.handleFileInput = this.handleFileInput.bind(this);
         this.handleLoadClick = this.handleLoadClick.bind(this);
         this.handleChangeOffer = this.handleChangeOffer.bind(this);
@@ -80,7 +81,7 @@ class Admin extends React.Component {
     };
 
     componentDidMount() {
-        //this.handleTimerButton(undefined, 'reset');
+        //this.handleResetButton(undefined, 'reset');
 
         this.socketClient.on('initAuction', message => {
             this.setState({
@@ -89,7 +90,6 @@ class Admin extends React.Component {
         });
 
         this.socketClient.on('playerConnected', players => {
-            console.log(players);
             this.setState({
                 playersConnected: players.value
             })
@@ -105,8 +105,9 @@ class Admin extends React.Component {
             this.setState({
                 showPlayerOffer: message.value.value,
                 showTimer: false,
-                infoMessage: message.value.username + ' is typing is offer',
-                userTyping: message.value.username
+                infoMessage: message.value.user.username + ' is typing is offer',
+                userTyping: message.value.user,
+                playerOffer: this.state.currentPlayer.currentOffer + 1
             })
         });
 
@@ -116,18 +117,30 @@ class Admin extends React.Component {
             })
         });
 
-        this.socketClient.on('playerReserved', player => {
+        this.socketClient.on('playerReserved', message => {
+            let player = message.value.player;
+            let user = message.value.user;
             this.setState({
-                playerReserved: player.value
+                infoMessage: player.player + " bought by " + user.username,
+                currentPlayer: false,
+                showTimer: false,
+                showPlayerOffer: false
             })
         });
 
         this.socketClient.on('timer', message => {
-            console.log(message);
             this.setState({
                 time: message.value,
                 showTimer: true,
                 infoMessage: false,
+                showPlayerOffer: false
+            })
+        });
+
+        this.socketClient.on('resetOffer', message => {
+            this.setState({
+                showTimer: false,
+                infoMessage: message.value,
                 showPlayerOffer: false
             })
         });
@@ -148,7 +161,8 @@ class Admin extends React.Component {
 
         if (playerRole === 'default') {
             this.setState({
-                playerRoleClass: 'custom-select my-2 with-error'
+                playerRoleClass: 'custom-select my-2 with-error',
+                noMorePlayer: 'Select a role'
             })
         } else {
             const path = SOCKET_PATH + '/admin/player/next';
@@ -171,9 +185,17 @@ class Admin extends React.Component {
                 })
                 .then(result => {
                     console.log(result);
-                    this.setState({
-                        playerRoleClass: 'custom-select my-2'
-                    })
+                    if (result.currentPlayer === null) {
+                        this.setState({
+                            playerRoleClass: 'custom-select my-2',
+                            noMorePlayer: 'No more player for this role'
+                        })
+                    } else {
+                        this.setState({
+                            playerRoleClass: 'custom-select my-2',
+                            noMorePlayer: false
+                        })
+                    }
                 })
                 .catch(err => console.log(err));
         }
@@ -204,11 +226,11 @@ class Admin extends React.Component {
         }
     };
 
-    handleTimerButton = (event, type) => {
+    handleResetButton = (event, type) => {
         if (event) {
             event.preventDefault();
         }
-        const path = SOCKET_PATH + '/admin/timer/' + type;
+        const path = SOCKET_PATH + '/admin/timer/reset';
         const api_headers = new Headers();
         const token = getToken(this.props.username);
         api_headers.append('Accept', 'application/json');
@@ -217,7 +239,7 @@ class Admin extends React.Component {
         fetch(path, {
             method: 'POST',
             headers: api_headers,
-            body: JSON.stringify({playerRole: this.props.username}),
+            body: JSON.stringify({username: this.props.username}),
         })
             .then(result => {
                 if (result.status === 200) {
@@ -228,11 +250,6 @@ class Admin extends React.Component {
             })
             .then(result => {
                 console.log(result);
-                if (type === 'start') {
-                    this.setState({showTimer: true})
-                } else {
-                    this.setState({showTimer: false})
-                }
             })
             .catch(err => console.log(err));
     };
@@ -305,38 +322,58 @@ class Admin extends React.Component {
         const offerValue = event.target.value;
         this.socketClient.emit('playerTyping', {value: offerValue});
         this.setState({
-            playerOffer: offerValue
+            playerOffer: offerValue,
+            offerError: null
         });
     };
 
     handleSubmitOffer = (event) => {
         event.preventDefault();
-        const { playerOffer, currentPlayer } = this.state;
-        let offer = playerOffer.replace(',', '.');
+        const { playerOffer, currentPlayer, userTyping } = this.state;
+        let offer = playerOffer.toString().replace(',', '.');
         if (offer && !isNaN(offer)) {
-            const path = SOCKET_PATH + '/auction/reserve/' + currentPlayer._id;
-            const api_headers = new Headers();
-            const token = getToken(this.props.username);
-            api_headers.append('Accept', 'application/json');
-            api_headers.append('Content-Type', 'application/json');
-            api_headers.append('Authorization', `Bearer ${token}`);
-            fetch(path, {
-                method: 'POST',
-                headers: api_headers,
-                body: JSON.stringify({
-                    user: this.state.userTyping,
-                    offer: offer
-                }),
+            if (offer > userTyping.wallet) {
+                this.setState({
+                    offerError: 'You haven\'t enough money'
+                });
+            } else {
+                if (offer <= currentPlayer.currentOffer) {
+                    this.setState({
+                        offerError: 'Current offer is higher'
+                    });
+                } else {
+                    this.setState({
+                        offerError: null
+                    });
+                    const path = SOCKET_PATH + '/auction/reserve/' + currentPlayer._id;
+                    const api_headers = new Headers();
+                    const token = getToken(this.props.username);
+                    api_headers.append('Accept', 'application/json');
+                    api_headers.append('Content-Type', 'application/json');
+                    api_headers.append('Authorization', `Bearer ${token}`);
+                    fetch(path, {
+                        method: 'POST',
+                        headers: api_headers,
+                        body: JSON.stringify({
+                            user: this.state.userTyping.username,
+                            offer: offer
+                        }),
+                    })
+                        .then(result => {
+                            if (result.status === 200) {
+                                return result;
+                            } else {
+                                console.log(result);
+                            }
+                        })
+                        .then(result => console.log(result))
+                        .catch(err => console.log(err));
+                }
+            }
+        } else {
+            this.setState({
+                offerError: 'Insert a number'
             })
-                .then(result => {
-                    if (result.status === 200) {
-                        return result;
-                    } else {
-                        console.log(result);
-                    }
-                })
-                .then(result => console.log(result))
-                .catch(err => console.log(err));
         }
     };
 
@@ -363,6 +400,7 @@ class Admin extends React.Component {
                                 offer={this.state.playerOffer}
                                 handleChange={this.handleChangeOffer}
                                 handleSubmit={this.handleSubmitOffer}
+                                errors={this.state.offerError}
                             /> : ''
                         }
                         {this.state.currentPlayer ?
@@ -393,9 +431,9 @@ class Admin extends React.Component {
                             <div className="col-12 col-md-8 col-lg-6">
                                 <button
                                     className="btn btn-danger btn-block my-2"
-                                    onClick={event => this.handleTimerButton(event, 'reset')}
+                                    onClick={event => this.handleResetButton(event, 'reset')}
                                 >
-                                    Reset
+                                    Reset typing
                                 </button>
                             </div>
                         </div>
@@ -422,6 +460,11 @@ class Admin extends React.Component {
                             <div className="form-row justify-content-center">
                                 <div className="col-12 col-md-8 col-lg-6">
                                     <button type="submit" className="btn btn-success btn-block my-2">Next player</button>
+                                    {this.state.noMorePlayer ?
+                                        <small className="form-help my-2 text-muted with-error">
+                                            {this.state.noMorePlayer}
+                                        </small>
+                                        : ''}
                                 </div>
                             </div>
                         </div>

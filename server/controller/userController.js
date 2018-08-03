@@ -5,6 +5,7 @@ const customValidator = require('../utils/customValidators');
 const jsonWebToken = require('../crypto/jsonWebToken');
 
 const User = require('../model/user');
+const Player = require('../model/player');
 const DEFAULT_ROLE = 'user';
 
 /**
@@ -207,6 +208,64 @@ exports.delete_user = (req, res, next) => {
     User.findByIdAndDelete(req.params.id)
         .then(deletedUser => abstractController.return_request(req, res, next, {deletedUser: deletedUser}))
         .catch(err => next(err))
+};
+
+exports.get_all_info_user = (req, res, next) => {
+    const username= req.params.username;
+    const user = req.user;
+    if (username === user.username) {
+        let goalkeeperPromise = Player.find({
+            finalOwner: user._id,
+            role: 'goalkeeper'
+        }, null, {
+            sort: {player: 1}
+        }).then(players => players).catch(err => next(err));
+
+        let defenderPromise = Player.find({
+            finalOwner: user._id,
+            role: 'defender'
+        }, null, {
+            sort: {player: 1}
+        }).then(players => players).catch(err => next(err));
+
+        let midfielderPromise = Player.find({
+            finalOwner: user._id,
+            role: 'midfielder'
+        }, null, {
+            sort: {player: 1}
+        }).then(players => players).catch(err => next(err));
+
+        let forwardPromise = Player.find({
+            finalOwner: user._id,
+            role: 'forward'
+        }, null, {
+            sort: {player: 1}
+        }).then(players => players).catch(err => next(err));
+
+        let userPromise = User.findById(user._id).then(user => user).catch(err => next(err));
+
+        Promise.all([goalkeeperPromise, defenderPromise, midfielderPromise, forwardPromise, userPromise])
+            .then(promiseResults => {
+                const playersObject = {
+                    goalkeeper: promiseResults[0],
+                    defender: promiseResults[1],
+                    midfielder: promiseResults[2],
+                    forward: promiseResults[3]
+                };
+
+                abstractController.return_request(req, res, next, {
+                    user: promiseResults[4],
+                    players: playersObject
+                })
+            })
+            .catch(err => next(err));
+
+    } else {
+        return res.status(401).json({
+            auth: false,
+            command: 'You are not allowed to access to this area'
+        });
+    }
 };
 
 /**

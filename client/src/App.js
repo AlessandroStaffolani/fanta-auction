@@ -326,11 +326,7 @@ class App extends Component {
                             errorMsg: '',
                             value: '',
                         },
-                        userLogged: {
-                            id: result.user._id.toString(),
-                            username: result.user.username,
-                            wallet: result.user.wallet
-                        },
+                        userLogged: false,
                         isLoading: false,
                         title: 'Fanta Auction - Console',
                         currentPage: 'home'

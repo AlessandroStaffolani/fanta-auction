@@ -7868,6 +7868,13 @@ li.item {
     width: auto;
     vertical-align: middle; }
 
+.table-with-caption {
+  font-size: 0.8rem; }
+  .table-with-caption caption {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.5);
+    caption-side: top; }
+
 @keyframes app-logo-spin {
   from {
     transform: rotate(0deg); }

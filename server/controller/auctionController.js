@@ -44,12 +44,8 @@ exports.timer_start = (req, res, next) => {
 exports.timer_reset = (req, res, next) => {
     counter = 5;
     clearInterval(repeat);
-    SocketServer.sendAll('timer', counter);
-    SocketServer.sendAll('reset', true);
-    SocketServer.sendAll('message', '');
-    SocketServer.sendAll('reserved', false);
-    SocketServer.sendAdmin('timer', counter);
-    SocketServer.sendAdmin('currentPlayer', false);
+    SocketServer.sendAll('resetOffer', true);
+    SocketServer.sendAdmin('resetOffer', 'Auction enabled');
     res.header('Content-Type', 'application/json');
     res.status(200);
     res.json({send: true});
@@ -69,8 +65,9 @@ exports.init_player_offer = (req, res, next) => {
     if (user) {
         let message = {
             value: true,
-            username: user.username
+            user: user
         };
+        clearInterval(repeat);
         SocketServer.sendAll('playerOffer', message);
         SocketServer.sendAdmin('playerOffer', message);
         res.header('Content-Type', 'application/json');
@@ -114,6 +111,7 @@ exports.reserve_player = (req, res, next) => {
                                             SocketServer.sendAdmin('timer', 0);
                                             //SocketServer.sendAll('reset', true);
                                             clearInterval(repeat);
+                                            player_assign(player);
                                         } else {
                                             SocketServer.sendAll('timer', counter);
                                             SocketServer.sendAdmin('timer', counter);
@@ -133,5 +131,33 @@ exports.reserve_player = (req, res, next) => {
             auth: false,
             command: 'You are not allowed to access to this area'
         });
+    }
+};
+
+const player_assign = (playerData) => {
+
+    if (playerData) {
+        let updatePlayer = Player.findById(playerData._id)
+            .then(player => {
+                player.finalOffer = player.currentOffer;
+                player.finalOwner = player.currentOwner;
+                player.assigned = true;
+                return player.save().then(player => player);
+            });
+        updatePlayer.then(player => {
+            User.findById(player.finalOwner)
+                .then(user => {
+                    let wallet = user.wallet - player.finalOffer;
+                    if (wallet >= 0) {
+                        user.wallet = wallet;
+                        user.save()
+                            .then(user => {
+                                let message = {player: player, user: user};
+                                SocketServer.sendAll('playerReserved', message);
+                                SocketServer.sendAdmin('playerReserved', message);
+                            })
+                    }
+                })
+        })
     }
 };

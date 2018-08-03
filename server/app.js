@@ -84,6 +84,7 @@ const auth = require('./api/auth');
 const publicRoute = require('./api/public');
 const authController = require('./controller/authController');
 const auction = require('./api/auction');
+const user = require('./api/user');
 const admin = require('./api/admin');
 
 app.use('/', index);
@@ -91,6 +92,7 @@ app.use('/auth/', auth);
 app.use('/public/', publicRoute);
 app.use(authController.is_authenticated);
 app.use('/auction', auction);
+app.use('/users', user);
 app.use(authController.is_admin);
 app.use('/admin', admin);
 
