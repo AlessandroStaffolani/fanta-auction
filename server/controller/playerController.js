@@ -56,30 +56,43 @@ exports.next_player = [
         const playerRole = req.body.playerRole;
 
         if (abstractController.body_is_valid(req, res, next, playerRole)) {
-
-            Player.findOne({
-                role: playerRole,
-                assigned: false
-            }, null, {sort: {player: 1}})
-                .populate('currentOwner')
-                .then(player => {
-                    if (player === null) {
-                        abstractController.return_request(req, res, next, {
-                            currentPlayer: player
-                        });
-                    } else {
-                        SocketServer.sendAll('currentPlayer', player);
-                        SocketServer.sendAdmin('currentPlayer', player);
-                        SocketServer.sendPiUser('initAuction', false);
-
-                        abstractController.return_request(req, res, next, {
-                            currentPlayer: player
-                        });
-                    }
-                })
-                .catch(err => abstractController.return_bad_request(req, res, next, {
-                    errors: err
-                }))
+            get_next_player(req, res, next, playerRole);
         }
     }
 ];
+
+const get_next_player = (req, res, next, playerRole) => {
+
+    Player.findOne({
+        role: playerRole,
+        assigned: false,
+        skipped: false
+    }, null, {sort: {player: 1}})
+        .populate('currentOwner')
+        .then(player => {
+            if (player === null) {
+                abstractController.return_request(req, res, next, {
+                    currentPlayer: player
+                });
+            } else {
+                SocketServer.sendAll('currentPlayer', player);
+                SocketServer.sendAdmin('currentPlayer', player);
+                SocketServer.sendPiUser('initAuction', false);
+
+                abstractController.return_request(req, res, next, {
+                    currentPlayer: player
+                });
+            }
+        })
+        .catch(err => abstractController.return_bad_request(req, res, next, {
+            errors: err
+        }))
+};
+
+exports.skip_player = (req, res, next) => {
+
+    const currentPlayer = req.body.currentPlayer;
+    Player.findByIdAndUpdate(currentPlayer._id, {skipped: true})
+        .then(player => get_next_player(req, res, next, player.role))
+        .catch(err => next(err));
+};

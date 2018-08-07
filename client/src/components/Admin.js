@@ -56,6 +56,10 @@ class Admin extends React.Component {
             offerError: null,
             noMorePlayer: false,
             typeInfoMessage: '',
+            resetButton: {
+                disabled: false,
+                value: 'Skip player'
+            }
         };
 
         this.initSocketClient(this.state.adminToken);
@@ -88,6 +92,10 @@ class Admin extends React.Component {
             this.setState({
                 infoMessage: message.value,
                 typeInfoMessage: 'text-success',
+                resetButton: {
+                    disabled: false,
+                    value: 'Skip player'
+                }
             })
         });
 
@@ -99,7 +107,11 @@ class Admin extends React.Component {
 
         this.socketClient.on('currentPlayer', player => {
             this.setState({
-                currentPlayer: player.value
+                currentPlayer: player.value,
+                resetButton: {
+                    disabled: false,
+                    value: 'Skip player'
+                }
             })
         });
 
@@ -111,12 +123,20 @@ class Admin extends React.Component {
                 userTyping: message.value.user,
                 playerOffer: this.state.currentPlayer.currentOffer + 1,
                 typeInfoMessage: '',
+                resetButton: {
+                    disabled: false,
+                    value: 'Reset typing'
+                }
             })
         });
 
         this.socketClient.on('playerTyping', message => {
             this.setState({
-                playerOffer: message.value
+                playerOffer: message.value,
+                resetButton: {
+                    disabled: false,
+                    value: 'Reset typing'
+                }
             })
         });
 
@@ -129,6 +149,10 @@ class Admin extends React.Component {
                 showTimer: false,
                 showPlayerOffer: false,
                 typeInfoMessage: 'text-success',
+                resetButton: {
+                    disabled: false,
+                    value: 'Skip player'
+                }
             })
         });
 
@@ -139,6 +163,10 @@ class Admin extends React.Component {
                 infoMessage: false,
                 showPlayerOffer: false,
                 typeInfoMessage: '',
+                resetButton: {
+                    disabled: true,
+                    value: 'Skip player'
+                }
             })
         });
 
@@ -148,6 +176,10 @@ class Admin extends React.Component {
                 infoMessage: message.value,
                 showPlayerOffer: false,
                 typeInfoMessage: '',
+                resetButton: {
+                    disabled: false,
+                    value: 'Skip player'
+                }
             })
         });
     }
@@ -236,7 +268,12 @@ class Admin extends React.Component {
         if (event) {
             event.preventDefault();
         }
-        const path = SOCKET_PATH + '/admin/timer/reset';
+        let path = '';
+        if (type === 'reset-typing') {
+            path = SOCKET_PATH + '/admin/timer/reset';
+        } else {
+            path = SOCKET_PATH + '/admin/player/skip';
+        }
         const api_headers = new Headers();
         const token = getToken(this.props.username);
         api_headers.append('Accept', 'application/json');
@@ -245,7 +282,10 @@ class Admin extends React.Component {
         fetch(path, {
             method: 'POST',
             headers: api_headers,
-            body: JSON.stringify({username: this.props.username}),
+            body: JSON.stringify({
+                username: this.props.username,
+                currentPlayer: this.state.currentPlayer
+            }),
         })
             .then(result => {
                 if (result.status === 200) {
@@ -436,10 +476,11 @@ class Admin extends React.Component {
                         <div className="form-row justify-content-center">
                             <div className="col-12 col-md-8 col-lg-6">
                                 <button
+                                    disabled={this.state.resetButton.disabled}
                                     className="btn btn-danger btn-block my-2"
-                                    onClick={event => this.handleResetButton(event, 'reset')}
+                                    onClick={event => this.handleResetButton(event, this.state.showPlayerOffer ? 'reset-typing' : 'skip-player')}
                                 >
-                                    Reset typing
+                                    {this.state.resetButton.value}
                                 </button>
                             </div>
                         </div>

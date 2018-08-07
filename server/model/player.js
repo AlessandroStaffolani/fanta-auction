@@ -27,6 +27,10 @@ let PlayerSchema = new Schema(
             type: Boolean,
             default: false
         },
+        skipped: {
+            type: Boolean,
+            default: false
+        },
         currentOffer: {
             type: Number,
             default: 0

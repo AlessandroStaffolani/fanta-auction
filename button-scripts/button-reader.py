@@ -49,6 +49,11 @@ def main(argv):
 
     # -------- Main Program Loop -----------
     while not done:
+        import time
+        time.sleep(10)
+        if client_socket.get_button_enabled():
+            client_socket.emit({'button': 0})
+            
         joystick_count = pygame.joystick.get_count()
         if joystick_count > 0:
             joystick = pygame.joystick.Joystick(0)

@@ -13,6 +13,8 @@ router.post('/timer/start', auctionController.timer_start);
 
 router.post('/player/next', playerController.next_player);
 
+router.post('/player/skip', playerController.skip_player);
+
 router.post('/player/load', playerController.load_player);
 
 module.exports = router;
