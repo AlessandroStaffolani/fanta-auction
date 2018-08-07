@@ -388,6 +388,7 @@ class App extends Component {
                 handleLinkClick={this.handleLinkClick}
             />;
             if (userLogged && !isAdmin) {
+                console.log(this.state.userLogged);
                 content = <Console
                     handleLogout={this.handleLogoutClick}
                     username={this.state.userLogged.username}

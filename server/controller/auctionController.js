@@ -15,6 +15,7 @@ exports.emit_message = (req, res, next) => {
 exports.init_auction_player = (req, res, next) => {
     SocketServer.sendAll('initAuction', true);
     SocketServer.sendAdmin('initAuction', 'Auction initialized');
+    SocketServer.sendPiUser('initAuction', true);
     res.header('Content-Type', 'application/json');
     res.status(200);
     res.json({send: true});
@@ -46,6 +47,7 @@ exports.timer_reset = (req, res, next) => {
     clearInterval(repeat);
     SocketServer.sendAll('resetOffer', true);
     SocketServer.sendAdmin('resetOffer', 'Auction enabled');
+    SocketServer.sendPiUser('initAuction', true);
     res.header('Content-Type', 'application/json');
     res.status(200);
     res.json({send: true});

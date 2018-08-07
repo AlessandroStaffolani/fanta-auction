@@ -9,6 +9,7 @@ import Offer from "./Offer";
 import UserPlayers from "./UserPlayers";
 
 const SOCKET_PATH = config.serverPath;
+const USE_REAL_BUTTON = config.useRealButton;
 
 class Console extends Component {
     constructor(props) {
@@ -24,7 +25,8 @@ class Console extends Component {
             infoMessage: false,
             offerError: null,
             wallet: 0,
-            userPlayers: {}
+            userPlayers: {},
+            typeInfoMessage: '',
         };
         this.initSocketClient(this.state.userToken);
 
@@ -69,7 +71,8 @@ class Console extends Component {
             this.setState({
                 buttonDisabled: message.value.value,
                 infoMessage: message.value.user.username + ' is typing is offer',
-                playerOffer: this.state.currentPlayer.currentOffer + 1
+                playerOffer: this.state.currentPlayer.currentOffer + 1,
+                typeInfoMessage: '',
             })
         });
 
@@ -96,10 +99,19 @@ class Console extends Component {
                 currentPlayer: '',
                 showTimer: false,
                 showOfferForm: false,
-                buttonDisabled: true
+                buttonDisabled: true,
+                typeInfoMessage: 'text-success',
             });
             this.updateStatusAfterReserve();
         });
+
+        this.socketClient.on('buttonPressed', message => {
+            let button = parseInt(message.value.button);
+            const userButton = parseInt(this.props.buttonCode);
+            if (button === userButton) {
+                this.handleButtonClick();
+            }
+        })
     }
 
     initSocketClient = (token) => {
@@ -112,8 +124,10 @@ class Console extends Component {
         }
     };
 
-    handleButtonClick = (event) => {
-        event.preventDefault();
+    handleButtonClick = (event = undefined) => {
+        if (event) {
+            event.preventDefault();
+        }
         const path = SOCKET_PATH + '/auction/player/offer';
         const api_headers = new Headers();
         const token = getToken(this.props.username);
@@ -238,7 +252,7 @@ class Console extends Component {
     };
 
     render() {
-        const { username } = this.props;
+        const { username, buttonCode } = this.props;
         //console.log(getToken(username));
 
         return (
@@ -248,11 +262,12 @@ class Console extends Component {
                         <span className="username">{username}</span>
                     </h1>
                     <hr/>
-                    <h5 className="text-center text-sm-left">Wallet: {this.state.wallet}</h5>
+                    <h5 className="text-center text-sm-left d-inline-block">Wallet: {this.state.wallet}</h5>
+                    <h5 className="text-center text-sm-left d-inline-block ml-3">Button: {buttonCode}</h5>
                     <hr/>
                     <div className="row mt-4 justify-content-center">
                         <div className="col-12 col-md-8 order-md-12 mb-4 mb-md-0">
-                            {this.state.infoMessage ? <p className="player-wrapper player-reserved text-center">{this.state.infoMessage}</p> : ''}
+                            {this.state.infoMessage ? <p className={this.state.typeInfoMessage + " player-wrapper player-reserved text-center"}>{this.state.infoMessage}</p> : ''}
                             {this.state.showTimer ? <Timer time={this.state.time}/> : ''}
                             {this.state.showOfferForm ?
                                 <Offer
@@ -262,9 +277,13 @@ class Console extends Component {
                                     errors={this.state.offerError}
                                 />
                                 :
+                                !USE_REAL_BUTTON ?
                                 this.state.wallet > 0
                                     ? <Button disabled={this.state.buttonDisabled} handleClick={this.handleButtonClick}/>
                                     : <p className="player-wrapper player-reserved text-center">Your money are finished</p>
+                                : this.state.buttonDisabled
+                                    ? <p className="player-wrapper player-reserved text-center">Button is disabled</p>
+                                    : <p className="player-wrapper player-reserved text-center text-success">Button is enabled</p>
                             }
                         </div>
                     </div>

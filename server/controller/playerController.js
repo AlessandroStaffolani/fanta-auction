@@ -70,6 +70,7 @@ exports.next_player = [
                     } else {
                         SocketServer.sendAll('currentPlayer', player);
                         SocketServer.sendAdmin('currentPlayer', player);
+                        SocketServer.sendPiUser('initAuction', false);
 
                         abstractController.return_request(req, res, next, {
                             currentPlayer: player

@@ -12,7 +12,6 @@ const init = (server) => {
 
         // middleware
         io.use((socket, next) => {
-            console.log(socket.handshake);
             const token = socket.handshake.query.token;
 
             jwt.verify(token, process.env.SECRET, function (err, user) {
@@ -38,6 +37,7 @@ const init = (server) => {
             } else if (user.role === 'pi') {
                 newUserConnectedMessage = "Pi User connected";
                 piClient = socket;
+
             } else {
                 socket.on('playerTyping', (message) => {
                     sendAll('playerTyping', message.value);
@@ -51,7 +51,7 @@ const init = (server) => {
             }
             socket.on('message', message => {
                 console.log(message);
-                console.log(message.button);
+                sendAll('buttonPressed', message)
             });
             console.log(newUserConnectedMessage);
             //sendAll('message', newUserConnectedMessage);
@@ -81,6 +81,10 @@ const sendAdmin = (type, value) => {
     })
 };
 
+const sendPiUser = (type, value) => {
+    piClient.emit(type, value)
+};
+
 const sendConnectedClients = (toType) => {
     let clientsUsername = [];
     for (let username in connectedClients) {
@@ -93,4 +97,5 @@ module.exports = {
     init: init,
     sendAll: sendAll,
     sendAdmin: sendAdmin,
+    sendPiUser: sendPiUser
 };

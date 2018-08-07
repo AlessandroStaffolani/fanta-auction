@@ -7,6 +7,7 @@ class ClientSocketIO:
         self.host = host
         self.port = port
         self.socket_client = None
+        self.button_enabled = False
 
     def connect(self, user_token=None):
         if self.socket_client is None:
@@ -21,6 +22,7 @@ class ClientSocketIO:
             self.socket_client.on('disconnect', self.on_disconnect)
             self.socket_client.on('reconnect', self.on_reconnect)
             self.socket_client.on('message', self.on_message_response)
+            self.socket_client.on('initAuction', self.on_init_autction_response)
             self.socket_client.on('close', self.close)
 
     def close(self):
@@ -42,6 +44,10 @@ class ClientSocketIO:
         for item in args:
             print('message response', item)
 
+    def on_init_autction_response(self, value):
+        self.button_enabled = value
+        print(self.button_enabled)
+
     def emit(self, message):
         if self.socket_client is not None:
             print('Sending message: ', message)
@@ -53,3 +59,6 @@ class ClientSocketIO:
 
     def wait(self):
         self.socket_client.wait()
+
+    def get_button_enabled(self):
+        return self.button_enabled

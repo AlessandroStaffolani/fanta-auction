@@ -1,3 +1,4 @@
 {
-  "serverPath": "http://localhost:5000"
+  "serverPath": "http://localhost:5000",
+  "useRealButton": true
 }

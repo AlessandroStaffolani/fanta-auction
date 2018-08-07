@@ -62,7 +62,8 @@ def main(argv):
             # Possible joystick actions: JOYAXISMOTION JOYBALLMOTION JOYBUTTONDOWN JOYBUTTONUP JOYHATMOTION
             if event.type == pygame.JOYBUTTONDOWN:
                 print("Button pressed = ", event.button)
-                client_socket.emit({'button': event.button})
+                if client_socket.get_button_enabled():
+                    client_socket.emit({'button': event.button})
 
     # Close the window and quit.
     # If you forget this line, the program will 'hang'

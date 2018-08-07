@@ -55,6 +55,7 @@ class Admin extends React.Component {
             userTyping: null,
             offerError: null,
             noMorePlayer: false,
+            typeInfoMessage: '',
         };
 
         this.initSocketClient(this.state.adminToken);
@@ -85,7 +86,8 @@ class Admin extends React.Component {
 
         this.socketClient.on('initAuction', message => {
             this.setState({
-                infoMessage: message.value
+                infoMessage: message.value,
+                typeInfoMessage: 'text-success',
             })
         });
 
@@ -107,7 +109,8 @@ class Admin extends React.Component {
                 showTimer: false,
                 infoMessage: message.value.user.username + ' is typing is offer',
                 userTyping: message.value.user,
-                playerOffer: this.state.currentPlayer.currentOffer + 1
+                playerOffer: this.state.currentPlayer.currentOffer + 1,
+                typeInfoMessage: '',
             })
         });
 
@@ -124,7 +127,8 @@ class Admin extends React.Component {
                 infoMessage: player.player + " bought by " + user.username,
                 currentPlayer: false,
                 showTimer: false,
-                showPlayerOffer: false
+                showPlayerOffer: false,
+                typeInfoMessage: 'text-success',
             })
         });
 
@@ -133,7 +137,8 @@ class Admin extends React.Component {
                 time: message.value,
                 showTimer: true,
                 infoMessage: false,
-                showPlayerOffer: false
+                showPlayerOffer: false,
+                typeInfoMessage: '',
             })
         });
 
@@ -141,7 +146,8 @@ class Admin extends React.Component {
             this.setState({
                 showTimer: false,
                 infoMessage: message.value,
-                showPlayerOffer: false
+                showPlayerOffer: false,
+                typeInfoMessage: '',
             })
         });
     }
@@ -394,7 +400,7 @@ class Admin extends React.Component {
                 {this.state.infoMessage || this.state.showTimer || this.state.currentPlayer ? <hr/> : ''}
                 <div className="form-row my-4 justify-content-center">
                     <div className="col-12 col-md-10 col-lg-8 text-center">
-                        {this.state.infoMessage ? <h2 className="player-reserved">{this.state.infoMessage}</h2> : ''}
+                        {this.state.infoMessage ? <h2 className={this.state.typeInfoMessage + " player-reserved"}>{this.state.infoMessage}</h2> : ''}
                         {this.state.showTimer ? <Timer time={this.state.time}/> :
                             this.state.showPlayerOffer ? <Offer
                                 offer={this.state.playerOffer}
