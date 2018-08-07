@@ -3,6 +3,7 @@ const jsonWebToken = require('../crypto/jsonWebToken');
 
 const connectedClients = {};
 let adminClient = undefined;
+let piClient = undefined;
 let io = undefined;
 
 const init = (server) => {
@@ -11,6 +12,7 @@ const init = (server) => {
 
         // middleware
         io.use((socket, next) => {
+            console.log(socket.handshake);
             const token = socket.handshake.query.token;
 
             jwt.verify(token, process.env.SECRET, function (err, user) {
@@ -33,6 +35,9 @@ const init = (server) => {
                     sendAll('playerTyping', message.value);
                     sendAdmin('playerTyping', message.value);
                 });
+            } else if (user.role === 'pi') {
+                newUserConnectedMessage = "Pi User connected";
+                piClient = socket;
             } else {
                 socket.on('playerTyping', (message) => {
                     sendAll('playerTyping', message.value);
@@ -44,6 +49,10 @@ const init = (server) => {
                     sendConnectedClients('playerConnected');
                 }
             }
+            socket.on('message', message => {
+                console.log(message);
+                console.log(message.button);
+            });
             console.log(newUserConnectedMessage);
             //sendAll('message', newUserConnectedMessage);
         });

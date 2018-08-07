@@ -3,7 +3,7 @@ import React from 'react';
 class Register extends React.Component {
 
     render() {
-        const { username, password, confirmPassword, handleChange, handleSubmit, handleLinkClick } = this.props;
+        const { username, password, confirmPassword, handleChange, handleSubmit, handleLinkClick, buttonCode } = this.props;
         return (
             <div className="row justify-content-center">
                 <div className="col-12 col-md-8 col-lg-6">
@@ -54,6 +54,22 @@ class Register extends React.Component {
                                 />
                                 <div className="invalid-feedback">
                                     {confirmPassword.errorMsg}
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="buttonCode">Button code</label>
+                                <input
+                                    type="number"
+                                    onChange={handleChange}
+                                    className={buttonCode.className}
+                                    value={buttonCode.value}
+                                    id="buttonCode"
+                                    name="buttonCode"
+                                    placeholder="Enter button code"
+                                />
+                                <small className="form-help text-muted">Insert a number from 0 to 9</small>
+                                <div className="invalid-feedback">
+                                    {buttonCode.errorMsg}
                                 </div>
                             </div>
                             <div className="text-right">

@@ -7,7 +7,7 @@ const generateToken = (user) => {
         role: user.role,
         wallet: user.wallet,
     }, process.env.SECRET, {
-        expiresIn: 60 * 60, // expires in 1 hour,
+        expiresIn: 60 * 60 * 24, // expires in 24 hours,
         algorithm: 'HS512'
     });
 };

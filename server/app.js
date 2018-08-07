@@ -56,10 +56,11 @@ db.once('disconnected', function () {
 //==============================================================================
 
 /**
- * Server admin creation
+ * DB initialization
  */
-const adminUtils = require('./utils/adminUtils');
-adminUtils.adminCreation('admin');
+const dbInitialization = require('./utils/dbInitialization');
+dbInitialization.adminCreation('admin');
+dbInitialization.piUserCreation('piUser');
 
 //==============================================================================
 

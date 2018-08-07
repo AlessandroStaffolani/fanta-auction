@@ -3,7 +3,7 @@ import Console from './components/Console';
 import Login from './components/Login';
 import Register from './components/Register';
 import Loading from './components/Loading';
-import {validateRequiredInput} from "./utils/validation";
+import {validateRangeInteger, validateRequiredInput} from "./utils/validation";
 import { setToken, removeToken } from './utils/localStorageUtils';
 import config from './config/config';
 import Admin from "./components/Admin";
@@ -36,6 +36,11 @@ class App extends Component {
                 value: '',
             },
             confirmPassword: {
+                className: 'form-control',
+                errorMsg: '',
+                value: '',
+            },
+            buttonCode: {
                 className: 'form-control',
                 errorMsg: '',
                 value: '',
@@ -143,10 +148,16 @@ class App extends Component {
                                 errorMsg: '',
                                 value: '',
                             },
+                            buttonCode: {
+                                className: 'form-control',
+                                errorMsg: '',
+                                value: result.buttonCode,
+                            },
                             userLogged: {
                                 id: result.userId,
                                 username: result.username,
-                                wallet: result.wallet
+                                wallet: result.wallet,
+                                buttonCode: result.buttonCode
                             },
                             isLoading: false,
                             title: 'Fanta Auction - Console',
@@ -188,13 +199,18 @@ class App extends Component {
                 errorMsg: '',
                 value: '',
             },
+            buttonCode: {
+                className: 'form-control',
+                errorMsg: '',
+                value: '',
+            },
             currentPage: 'home'
         });
     };
 
     handleLinkClick = (event, page) => {
         event.preventDefault();
-        const { userLogged, username } = this.state;
+        const { userLogged, username, buttonCode } = this.state;
         let title = 'Fanta Auction';
         if (page !== 'home') {
             title += ' - ' + page[0].toUpperCase() + page.substr(1);
@@ -223,6 +239,11 @@ class App extends Component {
                 errorMsg: '',
                 value: '',
             },
+            buttonCode: {
+                className: 'form-control',
+                errorMsg: '',
+                value: buttonCode.value,
+            },
             userLogged: userLogged,
             isLoading: false,
             title: title
@@ -231,7 +252,7 @@ class App extends Component {
 
     handleSubmitRegister = (event) => {
         event.preventDefault();
-        const { username, password, confirmPassword } = this.state;
+        const { username, password, confirmPassword, buttonCode } = this.state;
         let hasErrors = false;
         let usernameValidation = validateRequiredInput(username, username.value);
         if (usernameValidation.hasError) {
@@ -254,6 +275,10 @@ class App extends Component {
                 confirmPasswordValidation.object.errorMsg = 'Password and confirm password must be the same';
             }
         }
+        let buttonCodeValidation = validateRangeInteger(buttonCode, buttonCode.value, 0, 9);
+        if (buttonCodeValidation.hasError) {
+            hasErrors = true;
+        }
 
         if (!hasErrors) {
             // register request
@@ -262,7 +287,8 @@ class App extends Component {
             this.setState({
                 username: usernameValidation.object,
                 password: passwordValidation.object,
-                confirmPassword: confirmPasswordValidation.object
+                confirmPassword: confirmPasswordValidation.object,
+                buttonCode: buttonCodeValidation.object
             })
         }
     };
@@ -275,7 +301,8 @@ class App extends Component {
         const userBody = JSON.stringify({
             user: {
                 username: this.state.username.value,
-                password: this.state.password.value
+                password: this.state.password.value,
+                buttonCode: this.state.buttonCode.value
             }
         });
         let hasErros = false;
@@ -326,6 +353,11 @@ class App extends Component {
                             errorMsg: '',
                             value: '',
                         },
+                        buttonCode: {
+                            className: 'form-control',
+                            errorMsg: '',
+                            value: '',
+                        },
                         userLogged: false,
                         isLoading: false,
                         title: 'Fanta Auction - Console',
@@ -356,7 +388,12 @@ class App extends Component {
                 handleLinkClick={this.handleLinkClick}
             />;
             if (userLogged && !isAdmin) {
-                content = <Console handleLogout={this.handleLogoutClick} username={this.state.userLogged.username} wallet={this.state.userLogged.wallet}/>
+                content = <Console
+                    handleLogout={this.handleLogoutClick}
+                    username={this.state.userLogged.username}
+                    wallet={this.state.userLogged.wallet}
+                    buttonCode={this.state.userLogged.buttonCode}
+                />
             } else if (userLogged && isAdmin) {
                 content = <Admin handleLogout={this.handleLogoutClick} username={this.state.userLogged.username}/>
             }
@@ -368,6 +405,7 @@ class App extends Component {
                 handleSubmit={this.handleSubmitRegister}
                 handleChange={this.handleInputChange}
                 handleLinkClick={this.handleLinkClick}
+                buttonCode={this.state.buttonCode}
             />
         }
 

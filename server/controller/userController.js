@@ -42,6 +42,7 @@ exports.post_user = [
 
     sanitizeBody('user.username').trim().escape(),
     sanitizeBody('user.password').trim().escape(),
+    sanitizeBody('user.buttonCode').trim().escape(),
 
     (req, res, next) => {
 
@@ -52,7 +53,8 @@ exports.post_user = [
             const user = new User({
                 username: req.body.user.username,
                 password: req.body.user.password,
-                role: DEFAULT_ROLE
+                role: DEFAULT_ROLE,
+                buttonCode: req.body.user.buttonCode
             });
 
             save_user(req, res, next, user, requested_user, true);
