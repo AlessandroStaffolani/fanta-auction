@@ -105,8 +105,9 @@ exports.reserve_player = (req, res, next) => {
                                     counter = 5;
                                     SocketServer.sendAll('currentPlayer', player);
                                     SocketServer.sendAdmin('currentPlayer', player);
-                                    SocketServer.sendAll('timer', counter);
-                                    SocketServer.sendAdmin('timer', counter);
+                                    /*SocketServer.sendAll('timer', counter);
+                                    SocketServer.sendAdmin('timer', counter);*/
+                                    SocketServer.sendPiUser('initAuction', false);
                                     repeat = setInterval(() => {
                                         if (counter === 0) {
                                             SocketServer.sendAll('timer', 0);
@@ -117,6 +118,7 @@ exports.reserve_player = (req, res, next) => {
                                         } else {
                                             SocketServer.sendAll('timer', counter);
                                             SocketServer.sendAdmin('timer', counter);
+                                            SocketServer.sendPiUser('initAuction', true);
                                             counter--;
                                         }
                                     }, 1000);

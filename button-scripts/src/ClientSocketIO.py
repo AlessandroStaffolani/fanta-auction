@@ -62,3 +62,6 @@ class ClientSocketIO:
 
     def get_button_enabled(self):
         return self.button_enabled
+
+    def set_button_enabled(self, value):
+        self.button_enabled = value

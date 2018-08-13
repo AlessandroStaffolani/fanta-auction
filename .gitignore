@@ -102,3 +102,6 @@ server/config/development.json
 server/config/production.json
 client/src/config/development.json
 client/src/config/production.json
+
+# button scripts ignore
+button-scripts/.git
